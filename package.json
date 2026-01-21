@@ -1,0 +1,35 @@
+{
+  "name": "deadbolt",
+  "version": "1.0.0",
+  "description": "deadbolt is a local windows service that filters and intrcepts outbound tcp connections from local device",
+  "keywords": [
+    "service;",
+    "proxy",
+    "listenser;",
+    "tcp",
+    "intreceptor",
+    "blocker"
+  ],
+  "homepage": "https://github.com/forgata/deadbolt#readme",
+  "bugs": {
+    "url": "https://github.com/forgata/deadbolt/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forgata/deadbolt.git"
+  },
+  "license": "ISC",
+  "author": "forgata",
+  "type": "module",
+  "main": "service.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start:service": "ts-node src/service.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
