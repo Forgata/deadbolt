@@ -2,7 +2,7 @@ import net from "node:net";
 import { handleConnection } from "./connectionHandler.js";
 
 const HOST = "127.0.0.1";
-const PORT = 8080;
+const PORT = 7890;
 
 export function startTcpServer() {
   const server = net.createServer((socket) => {
