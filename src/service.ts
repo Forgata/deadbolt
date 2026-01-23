@@ -7,3 +7,5 @@ async function main() {
   const proxy = await readSystemProxy();
   console.log("[Deadbolt][DEBUG] System Proxy State:", proxy);
 }
+
+main().catch((error) => console.error(error));
