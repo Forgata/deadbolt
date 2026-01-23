@@ -21,14 +21,15 @@
   "license": "ISC",
   "author": "forgata",
   "type": "module",
-  "main": "service.js",
+  "main": "./src/service.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start:service": "ts-node src/service.ts"
+    "dev": "nodemon"
   },
   "devDependencies": {
     "@types/node": "^25.0.10",
+    "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
