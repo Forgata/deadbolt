@@ -34,9 +34,9 @@ async function main() {
     process.exit(1);
   }
 
-  process.on("SIGINT", async () => await restoreProxyFromBackup);
-  process.on("SIGTERM", async () => await restoreProxyFromBackup);
-  process.on("exit", async () => await restoreProxyFromBackup);
+  process.on("SIGINT", async () => await restoreProxyFromBackup());
+  process.on("SIGTERM", async () => await restoreProxyFromBackup());
+  process.on("exit", async () => await restoreProxyFromBackup());
 }
 
 main().catch((error) => console.error(error));
