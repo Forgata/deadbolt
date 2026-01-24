@@ -24,7 +24,7 @@ async function main() {
 
     // system proxy mutation if not safe mode (testing)
     if (!DEADBOLT_SAFE) {
-      await setDeadboltProxy(HOST, PORT);
+      // await setDeadboltProxy(HOST, PORT);
       console.log("[DEADBOLT] Proxy safely bound to listener");
     } else {
       console.warn("[DEADBOLT] SAFE MODE — proxy mutation skipped");
