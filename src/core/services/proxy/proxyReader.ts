@@ -28,7 +28,7 @@ function parseRegistryOutput(output: string): ProxyConfig {
 
     if (trimmed.startsWith("ProxyEnable")) {
       const parts = trimmed.split(/\s+/);
-      enabled = parts[parts.length - 1] === "0x1";
+      enabled = parseInt(parts[parts.length - 1]!, 16) === 1;
     }
 
     if (trimmed.startsWith("ProxyServer")) {
@@ -45,7 +45,7 @@ function parseRegistryOutput(output: string): ProxyConfig {
   return { enabled, server, override };
 }
 
-export async function readSystemProxy(): Promise<ProxyConfig> {
+export async function readProxyConfig(): Promise<ProxyConfig> {
   const output = await queryRegistry();
   return parseRegistryOutput(output);
 }
