@@ -20,6 +20,7 @@ async function main() {
 
     // start tcp server
     await startTcpServer(handleConnection, PORT, HOST);
+    console.log(`[DEADBOLT] TCP Listener READY on ${HOST}:${PORT}`);
 
     // system proxy mutation if not safe mode (testing)
     if (!DEADBOLT_SAFE) {
