@@ -21,7 +21,7 @@ export async function restoreProxyFromBackup() {
     backup = JSON.parse(fs.readFileSync(BACKUP_FILE, "utf-8"));
   } catch (err) {
     console.error("[FILE_READ_ERROR] ", err);
-    return "BAACKUP_CORRUPT";
+    return "BACKUP_CORRUPT";
   }
 
   writeProxyConfig(backup);
