@@ -1,5 +1,5 @@
 import { exec } from "node:child_process";
-import type { ProxyConfig } from "./proxyState.js";
+import type { ProxyConfig } from "./types/proxyState.js";
 
 const REG_PATH =
   "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
