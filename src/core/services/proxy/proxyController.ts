@@ -1,4 +1,4 @@
-import { ProxyState, type ProxyConfig } from "./proxyState.js";
+import { ProxyState, type ProxyConfig } from "./types/proxyState.js";
 
 function isDeadboltProxy(
   server: string | null,
