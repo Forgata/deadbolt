@@ -1,8 +1,6 @@
 import net from "node:net";
 import { createConnectionContext } from "./connectionContext.js";
-
-const SOCKET_TIMEOUT_MS = 5000;
-const MAX_PREVIEW_BYTES = 1024;
+import { MAX_PREVIEW_BYTES, SOCKET_TIMEOUT_MS } from "./constants.js";
 
 export function handleConnection(socket: net.Socket) {
   const ctx = createConnectionContext();
