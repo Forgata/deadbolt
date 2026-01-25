@@ -3,3 +3,8 @@ export interface HeaderBufferResult {
   shouldTerminate: boolean;
   reason?: string;
 }
+
+export interface DecodedHeaders {
+  raw: string;
+  lines: string[];
+}
