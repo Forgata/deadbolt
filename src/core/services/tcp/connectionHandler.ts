@@ -13,8 +13,8 @@ export function handleConnection(socket: net.Socket) {
 
   socket.on("data", (chunk: Buffer) => {
     const result = bufferHttpHeaders(ctx, chunk);
-    ctx.bytesReceived += chunk.length;
-    ctx.buffer = Buffer.concat([ctx.buffer, chunk]);
+    // ctx.bytesReceived += chunk.length;
+    // ctx.buffer = Buffer.concat([ctx.buffer, chunk]);
 
     const preview = chunk.subarray(0, MAX_PREVIEW_BYTES);
 
@@ -35,7 +35,7 @@ export function handleConnection(socket: net.Socket) {
       );
       socket.pause();
     }
-    socket.end();
+    // socket.end();
   });
 
   //   on timeot

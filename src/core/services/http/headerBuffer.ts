@@ -7,7 +7,7 @@ export function bufferHttpHeaders(
   chunk: Buffer,
 ): HeaderBufferResult {
   if (ctx.headersComplete)
-    return { headersComplete: true, shouldTerminate: true };
+    return { headersComplete: true, shouldTerminate: false };
 
   // appending incoming bytes
   ctx.buffer = Buffer.concat([ctx.buffer, chunk]);
@@ -22,7 +22,7 @@ export function bufferHttpHeaders(
     };
 
   const headerEndIndex = ctx.buffer.indexOf(HEADER_TERMINATOR);
-  if (headerEndIndex === -1) {
+  if (headerEndIndex !== -1) {
     ctx.headersComplete = true;
     ctx.headerEndIndex = headerEndIndex + HEADER_TERMINATOR.length;
     return { headersComplete: true, shouldTerminate: false };
