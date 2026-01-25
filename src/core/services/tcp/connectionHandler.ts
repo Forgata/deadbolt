@@ -2,6 +2,7 @@ import net from "node:net";
 import { createConnectionContext } from "./connectionContext.js";
 import { MAX_PREVIEW_BYTES, SOCKET_TIMEOUT_MS } from "./constants.js";
 import { bufferHttpHeaders } from "../http/httpHeaderBuffer.js";
+import { sliceHeaders } from "../http/sliceHeaders.js";
 
 export function handleConnection(socket: net.Socket) {
   const ctx = createConnectionContext();
@@ -30,9 +31,8 @@ export function handleConnection(socket: net.Socket) {
     }
 
     if (result.headersComplete) {
-      console.log(
-        `[${ctx.id}] HTTP Headers complete at byte ${ctx.headerEndIndex}`,
-      );
+      const headerBuffer = sliceHeaders(ctx);
+      console.log(`[${ctx.id}] Header slice length: ${headerBuffer.length}`);
       socket.pause();
     }
     // socket.end();
