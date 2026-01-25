@@ -43,10 +43,9 @@ export function handleConnection(socket: net.Socket) {
 
       console.log(`[${ctx.id}] Header lines:`);
 
-      decoded.lines.forEach((line, index) =>
-        console.log(`   [${index}] ${line}`),
-      );
-
+      decoded.lines.forEach((line, index) => {
+        console.log(`  [${index}] ${line}`);
+      });
       socket.pause();
     }
     // socket.end();
