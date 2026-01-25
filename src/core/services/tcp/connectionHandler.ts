@@ -1,5 +1,4 @@
 import net from "node:net";
-import crypto from "node:crypto";
 import { createConnectionContext } from "./connectionContext.js";
 
 const SOCKET_TIMEOUT_MS = 5000;
