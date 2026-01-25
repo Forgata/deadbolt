@@ -32,6 +32,9 @@ export function handleConnection(socket: net.Socket) {
 
     if (result.headersComplete) {
       const headerBuffer = sliceHeaders(ctx);
+      console.log(
+        `[${ctx.id}] HTTP Headers complete at byte ${ctx.headerEndIndex}`,
+      );
       console.log(`[${ctx.id}] Header slice length: ${headerBuffer.length}`);
       socket.pause();
     }
