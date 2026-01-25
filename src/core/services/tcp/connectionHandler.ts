@@ -4,6 +4,7 @@ import { MAX_PREVIEW_BYTES, SOCKET_TIMEOUT_MS } from "./constants.js";
 import { bufferHttpHeaders } from "../http/httpHeaderBuffer.js";
 import { sliceHeaders } from "../http/sliceHeaders.js";
 import { decodeHttpHeaders } from "../http/decodeHeaders.js";
+import { HttpParseError, parseHttpHeaders } from "../http/httpHeaderParser.js";
 
 export function handleConnection(socket: net.Socket) {
   const ctx = createConnectionContext();
@@ -32,21 +33,39 @@ export function handleConnection(socket: net.Socket) {
     }
 
     if (result.headersComplete) {
-      const headerBuffer = sliceHeaders(ctx);
-      const decoded = decodeHttpHeaders(headerBuffer);
-
       console.log(
         `[${ctx.id}] HTTP Headers complete at byte ${ctx.headerEndIndex}`,
       );
+      const headerBuffer = sliceHeaders(ctx);
+      // const decoded = decodeHttpHeaders(headerBuffer);
+      try {
+        const parsed = parseHttpHeaders(headerBuffer);
+        ctx.host = parsed.headers.get("host") || null;
 
-      console.log(`[${ctx.id}] Header slice length: ${headerBuffer.length}`);
+        console.log(
+          `[${ctx.id}] Parsed request: ${parsed.method} ${parsed.target} ${parsed.version}`,
+        );
+        console.log(`[${ctx.id}] Host: ${ctx.host}`);
 
-      console.log(`[${ctx.id}] Header lines:`);
+        console.log(`[${ctx.id}] Header slice length: ${headerBuffer.length}`);
+        console.log(`[${ctx.id}] Header lines:`);
 
-      decoded.lines.forEach((line, index) => {
-        console.log(`  [${index}] ${line}`);
-      });
-      socket.pause();
+        parsed.headers.forEach((value, key) => {
+          console.log(`  [${key}] ${value}`);
+        });
+
+        socket.pause();
+      } catch (error: unknown) {
+        if (error instanceof HttpParseError) {
+          console.warn(
+            `[${ctx.id}] HTTP parse error: ${error.code} - ${error.message}`,
+          );
+        } else {
+          console.error(`[${ctx.id}] Unexpected parse error`, error);
+        }
+        socket.destroy();
+        return;
+      }
     }
     // socket.end();
   });
