@@ -1,7 +1,7 @@
 import net from "node:net";
 import { createConnectionContext } from "./connectionContext.js";
 import { MAX_PREVIEW_BYTES, SOCKET_TIMEOUT_MS } from "./constants.js";
-import { bufferHttpHeaders } from "../http/headerBuffer.js";
+import { bufferHttpHeaders } from "../http/httpHeaderBuffer.js";
 
 export function handleConnection(socket: net.Socket) {
   const ctx = createConnectionContext();
