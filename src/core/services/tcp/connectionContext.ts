@@ -10,5 +10,6 @@ export function createConnectionContext(): ConnectionContext {
     headerEndIndex: null,
     host: null,
     createdAt: new Date(),
+    protocol: "UNKNOWN",
   };
 }
