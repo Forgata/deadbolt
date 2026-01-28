@@ -3,7 +3,6 @@ import { createConnectionContext } from "./connectionContext.js";
 import { MAX_PREVIEW_BYTES, SOCKET_TIMEOUT_MS } from "./constants.js";
 import { bufferHttpHeaders } from "../http/httpHeaderBuffer.js";
 import { sliceHeaders } from "../http/sliceHeaders.js";
-import { decodeHttpHeaders } from "../http/decodeHeaders.js";
 import { HttpParseError, parseHttpHeaders } from "../http/httpHeaderParser.js";
 
 export function handleConnection(socket: net.Socket) {
@@ -37,7 +36,7 @@ export function handleConnection(socket: net.Socket) {
         `[${ctx.id}] HTTP Headers complete at byte ${ctx.headerEndIndex}`,
       );
       const headerBuffer = sliceHeaders(ctx);
-      // const decoded = decodeHttpHeaders(headerBuffer);
+
       try {
         const parsed = parseHttpHeaders(headerBuffer);
         ctx.host = parsed.headers.get("host") || null;
