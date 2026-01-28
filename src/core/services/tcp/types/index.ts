@@ -6,4 +6,5 @@ export interface ConnectionContext {
   headerEndIndex: number | null;
   host: string | null;
   createdAt: Date;
+  protocol?: "TLS" | "HTTP" | "UNKNOWN";
 }
