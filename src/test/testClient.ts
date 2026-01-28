@@ -1,9 +1,23 @@
 import net from "node:net";
 
-const client = net.createConnection({ host: "127.0.0.1", port: 7890 }, () => {
-  client.write("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n");
-});
+export function testParser(data: string) {
+  const client = new net.Socket();
 
-client.on("end", () => {
-  console.log("Disconnected");
-});
+  client.connect(7890, "127.0.0.1", () => {
+    console.log("Connected, sending data...");
+    client.write(data);
+  });
+
+  client.on("data", (chunk) => {
+    console.log("Received:", chunk.toString());
+    client.destroy();
+  });
+
+  client.on("close", () => {
+    console.log("Connection closed");
+  });
+
+  client.on("error", (err) => {
+    console.error("Client error:", err);
+  });
+}
