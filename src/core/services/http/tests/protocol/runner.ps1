@@ -17,18 +17,21 @@ foreach ($File in $TestFiles) {
     
     try {
         $Client = New-Object System.Net.Sockets.TcpClient($Address, $Port)
+        $Client.NoDelay = $true
         $Stream = $Client.GetStream()
 
         $Payload = [System.IO.File]::ReadAllBytes($File.FullName)
 
         $Stream.Write($Payload, 0, $Payload.Length)
         $Stream.Flush()
-        
-        Start-Sleep -Milliseconds 250
+
+        Start-Sleep -Milliseconds 500
         
         $Client.Close()
         Write-Host "[ SENT ]" -ForegroundColor Green
         $Passed++
+        
+        Start-Sleep -Milliseconds 500
     }
     catch {
         Write-Host "[ FAIL ]" -ForegroundColor Red
