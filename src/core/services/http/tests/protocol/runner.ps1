@@ -1,9 +1,7 @@
-# Configuration
 $Address = "127.0.0.1"
 $Port = 7890
 $CasesPath = Join-Path $PSScriptRoot "cases"
 
-# Get all .txt files and sort them numerically/alphabetically
 $TestFiles = Get-ChildItem -Path $CasesPath -Filter "*.txt" | Sort-Object Name
 
 Write-Host "`n========================================" -ForegroundColor Gray
@@ -21,14 +19,11 @@ foreach ($File in $TestFiles) {
         $Client = New-Object System.Net.Sockets.TcpClient($Address, $Port)
         $Stream = $Client.GetStream()
 
-        # Read the exact raw bytes from the file
         $Payload = [System.IO.File]::ReadAllBytes($File.FullName)
 
-        # Send the payload
         $Stream.Write($Payload, 0, $Payload.Length)
         $Stream.Flush()
-
-        # Small delay for the server to process and close
+        
         Start-Sleep -Milliseconds 250
         
         $Client.Close()
