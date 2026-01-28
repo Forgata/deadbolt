@@ -1,45 +1,29 @@
-$Address = "127.0.0.1"
-$Port = 7890
-$CasesPath = Join-Path $PSScriptRoot "cases"
+# Get all .ps1 files in the cases directory
+$testPath = Join-Path (Get-Location) "cases"
+$testFiles = Get-ChildItem -Path $testPath -Filter "*.ps1" | Sort-Object Name
 
-$TestFiles = Get-ChildItem -Path $CasesPath -Filter "*.txt" | Sort-Object Name
+Write-Host "--- STARTING PROTOCOL TEST SUITE ---" -ForegroundColor Cyan
+Write-Host "Found $($testFiles.Count) test cases.`n"
 
-Write-Host "`n========================================" -ForegroundColor Gray
-Write-Host "   HTTP PARSER PROTOCOL TEST SUITE" -ForegroundColor Yellow
-Write-Host "========================================`n" -ForegroundColor Gray
-
-$Passed = 0
-$Failed = 0
-
-foreach ($File in $TestFiles) {
-    $TestName = $File.BaseName
-    Write-Host "TEST: $($TestName.PadRight(25))" -NoNewline -ForegroundColor White
+foreach ($file in $testFiles) {
+    Write-Host "EXECUTING: $($file.Name)... " -NoNewline -ForegroundColor Yellow
     
-    try {
-        $Client = New-Object System.Net.Sockets.TcpClient($Address, $Port)
-        $Client.NoDelay = $true
-        $Stream = $Client.GetStream()
-
-        $Payload = [System.IO.File]::ReadAllBytes($File.FullName)
-
-        $Stream.Write($Payload, 0, $Payload.Length)
-        $Stream.Flush()
-
-        Start-Sleep -Milliseconds 500
-        
-        $Client.Close()
-        Write-Host "[ SENT ]" -ForegroundColor Green
-        $Passed++
-        
-        Start-Sleep -Milliseconds 500
+    try {        
+        & $file.FullName
+        Write-Host "[ DONE ]" -ForegroundColor Green
     }
     catch {
-        Write-Host "[ FAIL ]" -ForegroundColor Red
-        Write-Host "      Reason: $($_.Exception.Message)" -ForegroundColor DarkGray
-        $Failed++
+        Write-Host "[ ERROR ]" -ForegroundColor Red
+        Write-Host "$($_.Exception.Message)" -ForegroundColor Gray
     }
+
+    # 5-second gap
+    Write-Host "Cooldown: " -NoNewline -ForegroundColor DarkGray
+    for ($i = 5; $i -gt 0; $i--) {
+        Write-Host "$i " -NoNewline
+        Start-Sleep -Seconds 1
+    }
+    Write-Host "`n"
 }
 
-Write-Host "`n========================================" -ForegroundColor Gray
-Write-Host " RESULTS: $Passed Sent / $Failed Failed" -ForegroundColor Yellow
-Write-Host "========================================`n" -ForegroundColor Gray
+Write-Host "--- ALL TESTS COMPLETED ---" -ForegroundColor Cyan
