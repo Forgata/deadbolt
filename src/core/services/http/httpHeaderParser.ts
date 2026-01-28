@@ -27,7 +27,13 @@ export function parseHttpHeaders(buffer: Buffer): ParsedHttpRequest {
 
   //   request line
   const requestLine = lines.shift()!;
-  const [method, target, version] = requestLine.split(" ");
+  const parts = requestLine.trim().split(/\s+/);
+
+  if (parts.length !== 3) {
+    throw new HttpParseError("BAD_REQUEST_LINE", "Malformed HTTP request line");
+  }
+
+  const [method, target, version] = parts;
 
   if (!method || !target || !version)
     throw new HttpParseError("BAD_REQUEST_LINE", "Malformed HTTP request line");
@@ -42,7 +48,9 @@ export function parseHttpHeaders(buffer: Buffer): ParsedHttpRequest {
   const headers = new Map<string, string>();
 
   for (const line of lines) {
-    if (!line.includes(":"))
+    if (line === "") continue;
+    const colonIndex = line.indexOf(":");
+    if (colonIndex <= 0)
       throw new HttpParseError(
         `BAD_HEADER_LINE`,
         `Malformed HTTP header line: ${line}`,
@@ -79,11 +87,26 @@ export function parseHttpHeaders(buffer: Buffer): ParsedHttpRequest {
   }
 
   // header checks
-  if (version === "HTTP/1.1" && !headers.has("host"))
+  const isAbsoluteForm =
+    target.startsWith("http://") || target.startsWith("https://");
+
+  if (isAbsoluteForm) {
+    try {
+      new URL(target);
+    } catch {
+      throw new HttpParseError(
+        "BAD_REQUEST_TARGET",
+        "Invalid absolute-form request target",
+      );
+    }
+  }
+
+  if (version === "HTTP/1.1" && !isAbsoluteForm && !headers.has("host")) {
     throw new HttpParseError(
       "MISSING_HOST",
       "Missing Host header in HTTP/1.1 request",
     );
+  }
 
   return {
     method,
