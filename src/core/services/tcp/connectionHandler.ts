@@ -7,6 +7,7 @@ import { HttpParseError, parseHttpHeaders } from "../http/httpHeaderParser.js";
 
 export function handleConnection(socket: net.Socket) {
   const ctx = createConnectionContext();
+  console.log("NEW CONNECTION");
   console.log(
     `[${ctx.id}] Connection opened from ${socket.remoteAddress}:${socket.remotePort}`,
   );
@@ -15,9 +16,6 @@ export function handleConnection(socket: net.Socket) {
 
   socket.on("data", (chunk: Buffer) => {
     const result = bufferHttpHeaders(ctx, chunk);
-    // ctx.bytesReceived += chunk.length;
-    // ctx.buffer = Buffer.concat([ctx.buffer, chunk]);
-
     const preview = chunk.subarray(0, MAX_PREVIEW_BYTES);
 
     console.log(
