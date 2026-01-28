@@ -4,6 +4,7 @@ import { MAX_PREVIEW_BYTES, SOCKET_TIMEOUT_MS } from "./constants.js";
 import { bufferHttpHeaders } from "../http/httpHeaderBuffer.js";
 import { sliceHeaders } from "../http/sliceHeaders.js";
 import { HttpParseError, parseHttpHeaders } from "../http/httpHeaderParser.js";
+import { detectProtocol } from "../tls/detectProtocol.js";
 
 export function handleConnection(socket: net.Socket) {
   const ctx = createConnectionContext();
@@ -15,6 +16,25 @@ export function handleConnection(socket: net.Socket) {
   socket.setTimeout(SOCKET_TIMEOUT_MS);
 
   socket.on("data", (chunk: Buffer) => {
+    // protocol detection
+    if (ctx.protocol === "UNKNOWN") {
+      const detectedProtocol = detectProtocol(chunk);
+
+      if (detectedProtocol === "UNKNOWN") {
+        console.warn(`[${ctx.id}] Unknown protocol, closing...`);
+        socket.destroy();
+        return;
+      }
+      ctx.protocol = detectedProtocol;
+      console.log(`[${ctx.id}] Detected protocol: ${ctx.protocol}`);
+    }
+
+    if (ctx.protocol === "TLS") {
+      console.warn(`[${ctx.id}] TLS connection parked for SNI Parsing`);
+      socket.pause();
+      return;
+    }
+
     const result = bufferHttpHeaders(ctx, chunk);
     const preview = chunk.subarray(0, MAX_PREVIEW_BYTES);
 
