@@ -5,6 +5,9 @@ import { bufferHttpHeaders } from "../http/httpHeaderBuffer.js";
 import { sliceHeaders } from "../http/sliceHeaders.js";
 import { HttpParseError, parseHttpHeaders } from "../http/httpHeaderParser.js";
 import { detectProtocol } from "../tls/detectProtocol.js";
+import type { TlsBufferState } from "../tls/types/index.js";
+import { initTlsBufferState } from "../tls/tlsBuferInitialiser.js";
+import { bufferFirstTlsRecord, TlsParseError } from "../tls/tlsParser.js";
 
 export function handleConnection(socket: net.Socket) {
   const ctx = createConnectionContext();
@@ -14,6 +17,8 @@ export function handleConnection(socket: net.Socket) {
   );
 
   socket.setTimeout(SOCKET_TIMEOUT_MS);
+
+  const tlsState: TlsBufferState = initTlsBufferState();
 
   socket.on("data", (chunk: Buffer) => {
     // protocol detection
@@ -30,9 +35,25 @@ export function handleConnection(socket: net.Socket) {
     }
 
     if (ctx.protocol === "TLS") {
-      console.warn(`[${ctx.id}] TLS connection parked for SNI Parsing`);
-      socket.pause();
-      return;
+      try {
+        const record = bufferFirstTlsRecord(tlsState, chunk);
+        if (!record) {
+          console.log(
+            `[${ctx.id}] waiting for more bytes... (${tlsState.buffer.length})`,
+          );
+          return;
+        }
+        console.log(`[${ctx.id}] Full TLS record recieved (${record.length})`);
+        // todo parse client hello, extract sni
+        socket.pause();
+        return;
+      } catch (error: unknown) {
+        if (error instanceof TlsParseError) {
+          console.error(`[${ctx.id}] TLS Parse Error: ${error.message}`);
+          socket.destroy();
+          return;
+        }
+      }
     }
 
     const result = bufferHttpHeaders(ctx, chunk);
