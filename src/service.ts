@@ -5,7 +5,6 @@ import { ensureBackup } from "./core/services/proxy/proxyBackup.js";
 import { handleConnection } from "./core/services/tcp/connectionHandler.js";
 import { restoreProxyFromBackup } from "./core/services/proxy/restoreBackup.js";
 import { setDeadboltProxy } from "./core/services/proxy/setDeadboltProxy.js";
-import { testParser } from "./test/testClient.js";
 
 const HOST = "127.0.0.1";
 const PORT = 7890;
