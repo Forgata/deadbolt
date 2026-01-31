@@ -8,6 +8,7 @@ import { detectProtocol } from "../tls/detectProtocol.js";
 import type { TlsBufferState } from "../tls/types/index.js";
 import { initTlsBufferState } from "../tls/tlsBuferInitialiser.js";
 import { bufferFirstTlsRecord, TlsParseError } from "../tls/tlsParser.js";
+import { parseTlsRecordHeader } from "../tls/parseTlsRecordHeader.js";
 
 export function handleConnection(socket: net.Socket) {
   const ctx = createConnectionContext();
@@ -37,13 +38,26 @@ export function handleConnection(socket: net.Socket) {
     if (ctx.protocol === "TLS") {
       try {
         const record = bufferFirstTlsRecord(tlsState, chunk);
-        if (!record) {
+        if (!record) return;
+        const header = parseTlsRecordHeader(record);
+
+        if (header.status === "INCOMPLETE") {
           console.log(
-            `[${ctx.id}] waiting for more bytes... (${tlsState.buffer.length})`,
+            `[${ctx.id}] TLS record incomplete, need ${header.neededBytes} more bytes`,
           );
           return;
         }
-        console.log(`[${ctx.id}] Full TLS record recieved (${record.length})`);
+
+        if (header.status === "INVALID") {
+          console.error(`[${ctx.id}] TLS record invalid: ${header.reason}`);
+          socket.destroy();
+          return;
+        }
+
+        console.log(
+          `[${ctx.id}] TLS record OK | type=${header.contentType} | length=${header.recordLength} | version=${header.versionMajor}.${header.versionMinor}`,
+        );
+
         // todo parse client hello, extract sni
         socket.pause();
         return;
